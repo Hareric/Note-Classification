@@ -1,4 +1,4 @@
-# coding=utf-8
+# coding=utf-8 
 #        ┏┓　　　┏┓+ +
 # 　　　┏┛┻━━━┛┻┓ + +
 # 　　　┃　　　　　　 ┃ 　
@@ -34,6 +34,7 @@ def create_vector(message_cut, vocab_set, vocab_list):
     """
     创建向量
     :param message_cut: 已分词的文本
+    :param vocab_set: 词库集合，提高检索速度
     :param vocab_list: 词库
     :return: 该文本对应该词库的向量
     """
