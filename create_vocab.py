@@ -42,8 +42,12 @@ def load_file(file_name, charset='utf-8'):
     line = f1.readline().decode(charset).strip()
     line_list = []
     while line:
-        line_list.append(line)
-        line = f1.readline().decode(charset).strip()
+        line = line.strip()
+        if line:
+            line_list.append(line)
+            line = f1.readline().decode(charset)
+        else:
+            line = f1.readline().decode(charset)
     return line_list
 
 
@@ -87,7 +91,10 @@ def create_vocab_list(sentence_cut_list):
     total_num = len(sentence_cut_list)
     vocab_set = set([])
     for sentence_cut in sentence_cut_list:
-        vocab_set = vocab_set | set(sentence_cut)  # 消重取并集
+        for word in sentence_cut:
+            if word not in vocab_set:
+                vocab_set.add(word)
+        # vocab_set = vocab_set | set(sentence_cut)  # 消重取并集
         sys.stdout.write('\r           %5.2f%%' % (t / total_num * 100))
         sys.stdout.flush()
         t += 1
@@ -96,9 +103,13 @@ def create_vocab_list(sentence_cut_list):
     return list(vocab_set)
 
 if __name__ == '__main__':
+    import time
+    t1 = time.time()
     data = load_file('dataSet/note_training.txt')
-    messages = [i.split()[2] for i in data]
+    messages = [i.split('\t')[2] for i in data]
     messages_cut = cut_sentence(messages)
     vocab = create_vocab_list(messages_cut)
     vocab.sort()
     write_file('dataSet/vocab.txt', vocab)
+    t2 = time.time()
+    print "\n finished   use time: %5.2fs" % (t2-t1)

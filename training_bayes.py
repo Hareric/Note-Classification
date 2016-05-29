@@ -86,24 +86,28 @@ def create_matrix(message_cut_list, vocab_list):
     """
     return_matrix = []
     total = len(message_cut_list)
+    vocab_set = set(vocab_list)
     print "creating matrix..."
     for index, message in enumerate(message_cut_list):
         sys.stdout.write("\r   %5.2f%%" % (index * 1.0 / total * 100))
         sys.stdout.flush()
-        return_matrix.append(create_vector(message, vocab_list))
+        return_matrix.append(create_vector(message, vocab_set, vocab_list))
     sys.stdout.write("\r")
     print "\ncreating done"
     return return_matrix
 
 
 if __name__ == '__main__':
+    import time
+    t1 = time.time()
+
     data = load_file('dataSet/note_training.txt')
     vocab = load_file('dataSet/new_vocab.txt')
     part_num = len(data) / 8  # 将训练集分为8个部分进行训练
     for part in range(8):
         print "part:", part + 1
-        class_result = [int(i.split()[1]) for i in data[part_num * part:part_num * (part + 1)]]
-        messages = [i.split()[2] for i in data[part_num * part:part_num * (part + 1)]]
+        class_result = [int(i.split('\t')[1]) for i in data[part_num * part:part_num * (part + 1)]]
+        messages = [i.split('\t')[2] for i in data[part_num * part:part_num * (part + 1)]]
         messages_cut = cut_sentence(messages)
         feature_matrix = create_matrix(messages_cut, vocab)
         p0_vec, p1_vec, p_spam = train_bayes(feature_matrix, class_result, is_first=part == 0, is_last=part == 7)
@@ -111,3 +115,6 @@ if __name__ == '__main__':
     np.save('classifier/done/p0_vec', p0_vec)
     np.save('classifier/done/p1_vec', p1_vec)
     np.save('classifier/done/p_spam', p_spam)
+
+    t2 = time.time()
+    print "\n finished   use time: %5.2fs" % (t2-t1)

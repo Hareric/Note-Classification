@@ -80,9 +80,12 @@ def get_test_score(real_list, predict_list):
         0.65 * (A / (A + C)) + 0.35 * (A / (A + B)))
 
 if __name__ == '__main__':
-    data = load_file('dataSet/note_unknown.txt')[:1000]
+    import time
+    t1 = time.time()
+    data = load_file('dataSet/note_unknown.txt')
     vocab = load_file('dataSet/new_vocab.txt')
-    messages_unknown = [i.split()[1] for i in data]
+    vocab_set = set(vocab)
+    messages_unknown = [i.split('\t')[1] for i in data]
     messages_unknown_cut = cut_sentence(messages_unknown)
     p0_vec = np.load('classifier/done/p0_vec.npy')
     p1_vec = np.load('classifier/done/p1_vec.npy')
@@ -90,7 +93,7 @@ if __name__ == '__main__':
     predict_result = []  # 保存预测结果列表
     for index, message in enumerate(messages_unknown_cut):
         sys.stdout.write('\r classing....%i' % index)
-        message_vec = create_vector(message, vocab)
+        message_vec = create_vector(message, vocab_set, vocab)
         # 使用测试集多次测试后，将p_spam调至0.006
         predict_result.append(classify_bayes(message_vec, p0_vec=p0_vec, p1_vec=p1_vec, p_spam=0.006))
         del message_vec  # 回收内存
@@ -105,3 +108,6 @@ if __name__ == '__main__':
     for i in range(len(predict_result)):
         write_lines.append("%i,%i" % (i+800001, predict_result[i]))
     write_file('dataSet/result_predict.txt', write_lines)
+
+    t2 = time.time()
+    print "\n finished   use time: %5.2fs" % (t2-t1)
