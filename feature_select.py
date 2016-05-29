@@ -62,7 +62,7 @@ if __name__ == '__main__':
         sys.stdout.flush()
         if class_list[i] == '1':
             sum_spam += create_vector(jieba.cut(message_list[i]), vocab_set, vocab)
-    selected = np.where(sum_spam > 0)[0]  # 某个特征在垃圾短信存在过，则判定为有效特征
+    selected = np.where(sum_spam > 0)[0]  # 某个特征在垃圾短信存在过，则判定为有效特征（等同于只用垃圾短信构建词库）
     new_vocab = [vocab[i] for i in selected]
     write_file("dataSet/new_vocab.txt", new_vocab)
 
