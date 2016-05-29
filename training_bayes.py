@@ -103,14 +103,15 @@ if __name__ == '__main__':
 
     data = load_file('dataSet/note_training.txt')
     vocab = load_file('dataSet/new_vocab.txt')
-    part_num = len(data) / 8  # 将训练集分为8个部分进行训练
-    for part in range(8):
+    p = 10  # 将训练集划分p个部分分别训练，（可根据电脑情况人工修改）
+    part_num = len(data) / p  # 将训练集分为p个部分进行训练
+    for part in range(p):
         print "part:", part + 1
         class_result = [int(i.split('\t')[1]) for i in data[part_num * part:part_num * (part + 1)]]
         messages = [i.split('\t')[2] for i in data[part_num * part:part_num * (part + 1)]]
         messages_cut = cut_sentence(messages)
         feature_matrix = create_matrix(messages_cut, vocab)
-        p0_vec, p1_vec, p_spam = train_bayes(feature_matrix, class_result, is_first=part == 0, is_last=part == 7)
+        p0_vec, p1_vec, p_spam = train_bayes(feature_matrix, class_result, is_first=part == 0, is_last=part == (p-1))
         del feature_matrix, class_result, messages_cut  # 回收内存
     np.save('classifier/done/p0_vec', p0_vec)
     np.save('classifier/done/p1_vec', p1_vec)
